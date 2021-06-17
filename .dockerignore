@@ -1,0 +1,17 @@
+.envs
+.env
+
+.vscode
+coverage
+
+node_modules
+npm-debug.log
+.nyc_output
+reports
+resources
+
+.git
+.gitignore
+
+docs
+README.md

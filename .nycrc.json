@@ -1,0 +1,14 @@
+{
+    "report-dir": "reports",
+    "reporter": [
+        "text",
+        "text-summary"
+    ],
+    "include": [
+        "src/**/*.js"
+    ],
+    "exclude": [
+        "src/app.js",
+        "src/ctrls/dbCtrl.js"
+    ]
+}

@@ -1,0 +1,35 @@
+version: "3.7"
+
+networks:
+  backend_network:
+
+volumes:
+  pg_data:
+
+services:
+  api:
+    image: localhost:5000/fibness/api-prod:latest
+    depends_on:
+      - pg
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL_PROD}
+    networks:
+      - backend_network
+    ports:
+      - "3000:3000"
+    volumes:
+      - /home/alumne/prod/resources:/home/api/resources
+  
+  pg:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${DB_PROD_USR}
+      POSTGRES_PASSWORD: ${DB_PROD_PSW}
+      POSTGRES_DB: fibness
+    networks:
+      - backend_network
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data

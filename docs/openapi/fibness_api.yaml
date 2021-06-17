@@ -1,0 +1,2356 @@
+openapi: 3.0.0
+info:
+  title: Fibness API
+  version: "1.0.0"
+servers:
+  - url: 'http://10.4.41.146:3001'
+    description: FIB server, UPC VPN required to connect
+tags:
+  - name: user
+    description: Operations about users
+  - name: training
+    description: Operations about trainings
+  - name: exercise
+    description: Operations about exercises  
+  - name: diet
+    description: Operations about diets
+  - name: meal
+    description: Operations about meals
+  - name: aliment
+    description: Operations about aliments
+  - name: comment
+    description: Operations about comments
+  - name: event
+    description: Operations about events
+  - name: likeelemento
+    description: Operations about likes on elements
+paths:
+  /user:
+    post:
+      summary: Creates a user
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  example: Oriol
+                email:
+                  type: string
+                  example: oriol@example.com
+                password:
+                  type: string
+                  description: Hashed user password
+                  example: '5f4dcc3b5aa765d61d8327deb882cf99'
+              required:
+                - nombre
+                - password
+                - email
+      responses:
+        201:
+          description: User created succesfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  created:
+                    type: boolean
+                    enum: [true]
+                  id:
+                    type: integer
+                    example: 12345
+                required:
+                  - created
+                  - id
+        400:
+          description: >-
+            Some required parameters are missing or with an incorrect type or a
+            user with the given email already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  created:
+                    type: boolean
+                    enum: [false]
+                  error:
+                    type: string
+                    example: null value in column 'email' violates constraint
+                required:
+                  - created 
+                  - error
+  /user/fb:
+    post:
+      summary: Log in a user with Facebook token
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  example: Oriol
+                email:
+                  type: string
+                  example: oriol@example.com
+                password:
+                  type: string
+                  description: Facebook token
+                  example: '5f4dcc3b5aa765d61d8327deb882cf99'
+              required:
+                - nombre
+                - password
+                - email
+      responses:
+        200:
+          description: User is correct
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 12345
+                required:
+                  - id
+        201:
+          description: User created succesfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 12345
+                required:
+                  - id
+  /user/validate:
+    post:
+      summary: Validates the given user
+      description: Validates a user with the given email and password exists
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: oriol@example.com
+                password:
+                  type: string
+                  description: Hashed user password
+                  example: '5f4dcc3b5aa765d61d8327deb882cf99'
+              required:
+                - email
+                - password
+      responses:
+        200:
+          description: Result from the validation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: true
+                  id:
+                    type: integer
+                    example: 1234
+                required:
+                  - result
+  /user/{id}:
+    delete:
+      summary: Deletes a user by id
+      tags:
+        - user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the user to delete
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Ok
+  /user/{id}/trainings:
+    get:
+      summary: Gives the trainings of a user
+      description: Returns all the trainings of the user with the given id
+      tags:
+        - user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the user to get the trainigs from
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Set of the ids, names and descriptions of the requested trainings
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    idelemento:
+                      type: integer
+                    nombre:
+                      type: string
+                    descripcion:
+                      type: string
+                    nlikes:
+                      type: integer
+                    ncomentarios:
+                      type: integer
+                example:
+                  - idelemento: 28
+                    nombre: TrainingTest
+                    descripcion: DescriptionTest
+                    nlikes: 20
+                    ncomentarios: 2
+                  - idelemento: 40
+                    nombre: TrainingTest2
+                    descripcion: DescriptionTest2
+                    nlikes: 20
+                    ncomentarios: 2
+                required:
+                - trainingSet
+  /user/{id}/diets:
+    get:
+      summary: Gives the diets of a user
+      description: Returns all the diets of the user with the given id
+      tags:
+        - user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the user to get the diets from
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Set of the ids, names and descriptions of the requested diets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    idelemento:
+                      type: integer
+                    nombre:
+                      type: string
+                    descripcion:
+                      type: string
+                    nlikes:
+                      type: integer
+                    ncomentarios:
+                      type: integer
+                example:
+                  - idelemento: 23
+                    nombre: DietTest
+                    descripcion: DescriptionTest
+                    nlikes: 20
+                    ncomentarios: 2
+                  - idelemento: 69
+                    nombre: DietTest2
+                    descripcion: DescriptionTest2
+                    nlikes: 20
+                    ncomentarios: 2
+                required:
+                - dietSet
+  /user/{id}/routes:
+    get:
+      summary: Gives the routes of a user 
+      description: Returns all the routes of the user with given id
+      tags:
+        - user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the user, whose's routes we want to get
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Set of the ids, names and descriptions and others of the requested routes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  idelemento:
+                    type: integer
+                  nombre:
+                    type: string
+                  descripcion:
+                    type: string
+                  origen:
+                    type: string
+                  destino:
+                    type: string
+                  distancia:
+                    type: string
+                  nlikes:
+                    type: integer
+                  ncomentarios:
+                    type: integer
+                example:
+                  - idelemento: 3
+                    nombre: routeTest
+                    descripcion: routeDescription
+                    origen: 42.471615;2.271684
+                    destino: 45.471615;5.271684
+                    distancia: 60
+                    nlikes: 20
+                    ncomentarios: 2
+                    
+                  - idelemento: 4
+                    nombre: routeTest2
+                    descripcion: routeDescription2
+                    origen: 43.471615;3.271684
+                    destino: 46.471615;6.271684
+                    distancia: 70
+                    nlikes: 20
+                    ncomentarios: 2
+                required:
+                      - activitySet
+  /user/{id}/events:
+    get:
+      summary: Returns all events created by the user
+      description: Returns all events created by the user ordered by data
+      tags:
+        - user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the user
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Returns all events created by the user ordered by data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+                  
+  /user/{id}/statistics:
+    get:
+      summary: Gives the statistic of a user 
+      description: Returns all the statistics from a user during the current week. A week starts on Mondays. Notice that Monday is 1, and Tuesday is 2 and so on.
+      tags:
+        - user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the user, whose's statistic we want to get
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Set of the dates, distances of the requested statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dia:
+                    type: integer
+                  dstrecorrida:
+                    type: string
+                example:
+                  - dia: 1
+                    dstrecorrida: '60'
+                 
+                  - dia: 2
+                    dstrecorrida: '100'
+                    
+                required:
+                      - activitySet   
+  
+  /user/resetPassword:
+    put:
+      summary: Replaces the current password of the user.
+      description: Changes the password of the given user by the new one given
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: oriol@example.com
+                password:
+                  type: string
+                  description: Hashed user password
+                  example: '5f4dcc3b5aa765d61d8327deb882cf99'
+              required:
+                - email
+                - password
+      responses:
+        200:
+          description: Result from the reset (true if it was reseted, false otherwise)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: boolean
+                    example: true
+                required:
+                  - result
+  /user/{id}/info:
+    get:
+      summary: Gets the info of the user
+      description: Returns the information of the given user
+      tags:
+        - user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the user to get the information from
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Information about the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nombre:
+                    type: string
+                    example: UserTest
+                  email:
+                    type: string
+                    example: user@example.com
+                  tipousuario:
+                    type: string
+                    example: principiante
+                  tipoperfil:
+                    type: string
+                    example: publico
+                  genero:
+                    type: boolean
+                    example: true
+                  descripcion:
+                    type: string
+                    example: Esta es mi descripcion
+                  fechadenacimiento:
+                    type: string
+                    example: 1978-01-30
+                  fecharegistro:
+                    type: string
+                    example: Thu Apr 29 2020
+                  pais:
+                    type: integer
+                    example: 54
+                  rutaimagen:
+                    type: string
+                    example: /home/marc/Escritorio/nodeTest
+                  nseguidores:
+                    type: integer
+                    example: 37
+                  nseguidos:
+                    type: integer
+                    example: 55
+                  npost:
+                    type: integer
+                    example: 100
+                required:
+                  - nombre
+                  - email
+                  - tipousuario
+                  - tipoperfil
+                  - genero
+                  - descripcion
+                  - fechadenacimiento
+                  - fecharegistro
+                  - pais
+                  - rutaimagen
+                  - nseguidores
+                  - nseguidos
+                  - npost
+    put:
+      summary: Update user info
+      tags:
+        - user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the user to get the information from
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  example: MiNuevoNombre
+                genero:
+                  type: boolean
+                  example: false
+                descripcion:
+                  type: string
+                  example: Mi nueva descripcion
+                fechadenacimiento:
+                  type: string
+                  example: 1997-12-30
+                pais:
+                  type: integer
+                  example: 56
+              required:
+                - nombre
+                - genero
+                - descripcion
+                - fechadenacimiento
+                - pais
+      responses:
+        200:
+          description: User is correct
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 12345
+                required:
+                  - id
+
+  /user/{id}/profile:
+    get:
+      summary: Get the user's profile image
+      tags:
+        - user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the user which profile image should be updated
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: User's profile image in base64
+          content:
+            image/*:
+              schema:
+                format: bas64
+    post:
+      summary: Set a new profile image
+      tags:
+        - user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User's id
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        description: Profile image in base64
+        required: true
+        content:
+          image/*:
+            schema:
+              format: base64
+      responses:
+        201:
+          description: Created
+
+  /user/{id}/settings:
+    get:
+      summary: Gets the settings of the user
+      description: Returns the settings of the given user
+      tags:
+        - user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the user to get the settings from
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Settings of the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  sedad:
+                    type: boolean
+                    example: false
+                  sdistancia:
+                    type: boolean
+                    example: true
+                  sinvitacion:
+                    type: boolean
+                    example: true
+                  sseguidor:
+                    type: boolean
+                    example: false
+                  nmensaje:
+                    type: boolean
+                    example: false
+                required:
+                  - info
+    put:
+      summary: Updates the settings of the user
+      description: Changes the settings of the user by the ones given
+      tags:
+        - user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the user to get the settings from
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sEdad:
+                  type: boolean
+                  example: false
+                sDistancia:
+                  type: boolean
+                  example: true
+                sInvitacion:
+                  type: boolean
+                  example: true
+                sSeguidor:
+                  type: boolean
+                  example: false
+                nMensaje:
+                  type: boolean
+                  example: false
+              required:
+                - sEdad
+                - sDistancia
+                - sInvitacion
+                - sSeguidor
+                - nMensaje
+      responses:
+        200:
+          description: OK
+  /user/{id}/globaldst:
+    get:
+      summary: Gets the user global traveled distance of the user
+      description: Returns the global traveled distance of the given user
+      tags:
+        - user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the user to get the global distance from
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Settings of the user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dstrecorrido:
+                    type: string
+                    example: "1000" 
+                required:
+                  - dstrecorrido
+          
+  /user/shortInfo/{currentID}:
+    get:
+      summary: Gets the brief info of all users
+      description: Returns username and id of all users except for the one that is given and the ones that are blocked by the user
+        - user
+      tags:
+        - user
+      parameters:
+        - name: currentID
+          in: path
+          required: true
+          description: The id of the user to NOT get the info from
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Information of the users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 5
+                    nombre:
+                      type: string
+                      example: user
+                    bloqueado:
+                      type: boolean
+                      example: true
+                example:
+                  - id: 7
+                    nombre: user
+                    bloqueado: false
+                  - id: 8
+                    nombre: user2
+                    bloqueado: true
+                    
+  /user/{id}/followers:
+    get:
+      summary: Gets the followers of a user
+      description: Returns the followers of a given user
+      tags:
+        - user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the user to get the followers from
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Information of the users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 5
+                    nombre:
+                      type: string
+                      example: user
+                example:
+                  - id: 7
+                    nombre: user
+                  - id: 8
+                    nombre: user2
+  /user/{id}/followed:
+    get:
+      summary: Gets the people followed by a user
+      description: Returns all the people that the given user follows
+      tags:
+        - user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the user to get the people who follows from
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Information of the users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 5
+                    nombre:
+                      type: string
+                      example: user
+                example:
+                  - id: 7
+                    nombre: user
+                  - id: 8
+                    nombre: user2
+  '/user/follow':
+    post:
+      summary: Creates a following
+      description: The user with idFollower will start following the user with idFollowed
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idFollower:
+                  type: integer
+                  example: 1
+                  description: id of the user that will start following
+                idFollowed:
+                  type: integer
+                  example: 2
+                  description: id of the user that will be followed by the first one
+              required:
+                - idFollower
+                - idFollowed
+      responses:
+        '201':
+          description: Attempted to create a following
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  isBlocked:
+                    type: boolean
+                    example: true
+                    description: true if one of the users has the other blocked (in which case the following
+                                  is not created). False if there is no blocking (the following is created)
+
+                required:
+                  - isBlocked
+        '400':
+          description: >-
+            Some required parameters are missing or with an incorrect type
+            
+  '/user/follow/{idFollower}/{idFollowed}':
+    delete:
+      summary: Deletes a following
+      description: The user with idFollower stops following the user with idFollowed 
+      tags:
+        - user
+      parameters:
+        - name: idFollower
+          in: path
+          required: true
+          description: The id of the user that started to follow
+          schema:
+            type: integer
+            minimum: 1
+        - name: idFollowed
+          in: path
+          required: true
+          description: The id of the user that was followed
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Following successfully eliminated
+        '400':
+          description: >-
+            Some required parameters are missing or with an incorrect type
+  '/user/block':
+    post:
+      summary: Blocks a user
+      description: The user with idBlocker will block the user with idBlocked
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idBlocker:
+                  type: integer
+                  example: 1
+                  description: id of the user that will be blocking
+                idBlocked:
+                  type: integer
+                  example: 2
+                  description: id of the user that will be blocked
+              required:
+                - idBlocker
+                - idBlocked
+      responses:
+        '201':
+          description: Attempted to create a blocking
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  blockerFollowedBlocked:
+                    type: boolean
+                    example: true
+                    description: true if idBlocker followed idBlocked (the following is eliminated). False
+                                  otherwise
+                  blockedFollowedBlocker:
+                    type: boolean
+                    example: false
+                    description: true if idBlocked followed idBlocker (the following is eliminated). False
+                                  otherwise
+                required:
+                  - blockerFollowedBlocked
+                  - blockedFollowedBlocker
+        '400':
+          description: >-
+            Some required parameters are missing or with an incorrect type
+            
+  '/user/block/{idBlocker}/{idBlocked}':
+    delete:
+      summary: Unblocks a user
+      description: The user with idBlocker will stop blocking the user with idBlocked 
+      tags:
+        - user
+      parameters:
+        - name: idBlocker
+          in: path
+          required: true
+          description: The id of the user that had blocked
+          schema:
+            type: integer
+            minimum: 1
+        - name: idBlocked
+          in: path
+          required: true
+          description: The id of the user that has beedn blocked
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Blocking removed
+        '400':
+          description: >-
+            Some required parameters are missing or with an incorrect type
+            
+  '/user/{id}/info/{id2}':
+    get:
+      summary: Gets the information of a user
+      description: Returns all the information of the given user
+      tags:
+        - user
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the user to get the info from
+          schema:
+            type: integer
+            minimum: 1
+        - name: id2
+          in: path
+          required: true
+          description: The id of the user that we check if is a follower of the user with id
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Information of the user
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 5
+                    nombre:
+                      type: string
+                      example: user
+                    descripcion:
+                      type: string
+                      example: hola
+                    fechadenacimiento:
+                      type: string
+                      example: 21-04-2010
+                    pais:
+                      type: string
+                      example: Alemania
+                    nseguidores:
+                      type: integer
+                      example: 5
+                    nseguidos:
+                      type: integer
+                      example: 10
+                    sedad:
+                      type: boolean
+                      example: true
+                    seguidor:
+                      type: boolean
+                      example: false
+                    smensaje: 
+                      type: boolean
+                      example: true
+                    seguir:
+                      type: boolean
+                      example: true
+                      description: checks if id2 follows id
+                    bloqueado:
+                      type: boolean
+                      example: false
+                      description: checks if id has blocked id2
+  '/user/like':
+    post:
+      summary: Likes an element or a comment
+      description: The user will indicate that it likes a comment or an element (training, route or diet)
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idUser:
+                  type: integer
+                  example: 1
+                  description: id of the user that will like something
+                idElement:
+                  type: integer
+                  example: 2
+                  description: id of the element OR COMMENT that wil be liked
+                type:
+                  type: string
+                  example: "comment"
+                  description: indicates if the idElement corresponds to an element (training, diet or route)
+                                or to a comment (type = "element" or "comment" respectively)
+              required:
+                - idUser
+                - idElement
+                - type
+      responses:
+        '201':
+          description: Like created successfully
+        '400':
+          description: >-
+            Some required parameters are missing or with an incorrect type
+  '/user/like/{idUser}/{idElement}/{type}':
+    delete:
+      summary: Unlikes a comment or element
+      description: The user with indicate that it no longer likes an element or comment 
+      tags:
+        - user
+      parameters:
+        - name: idUser
+          in: path
+          required: true
+          description: The id of the user will stop licking
+          schema:
+            type: integer
+            minimum: 1
+        - name: idElement
+          in: path
+          required: true
+          description: The id of the elemento that no longer will be licked by the user
+          schema:
+            type: integer
+            minimum: 1
+        - name: type
+          in: path
+          required: true
+          description: indicates whether the idElement references an element or comment
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Like removed
+        '400':
+          description: >-
+            Some required parameters are missing or with an incorrect type
+  '/user/import':
+    post:
+      summary: Imports an element from another user
+      description: Copies an element from another user in other to have it as your own and edit it.
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  example: "training"
+                  description: type of the element (training, diet or route)
+                idElement:
+                  type: integer
+                  example: 2
+                  description: id of the element to be imported
+                idUser:
+                  type: string
+                  example: 5
+                  description: id of the user that will import the element (NOT the owner of the element)
+              required:
+                - idUser
+                - idElement
+                - type
+      responses:
+        '201':
+          description: Like created successfully
+        '400':
+          description: >-
+            Some required parameters are missing or with an incorrect type
+  '/training':
+    post:
+      summary: Creates a training
+      description: Creates a training with the given description and name associated with the given user
+      tags:
+        - training
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  example: TrainingTest
+                descripcion:
+                  type: string
+                  example: TrainingDescriptionTest
+                idUser:
+                  type: integer
+                  description: id of the user
+                  example: 2
+              required:
+                - nombre
+                - descripcion
+                - idUser
+      responses:
+        '201':
+          description: Training created succesfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  idelemento:
+                    type: integer
+                    example: 12345
+                required:
+                  - idelemento
+        '400':
+          description: >-
+            Some required parameters are missing or with an incorrect type
+  '/training/{id}':
+    delete:
+      summary: Deletes a training by id
+      tags:
+        - training
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the training to delete
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Ok
+    put:
+      summary: Update a training by id
+      tags:
+        - training
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the training to update
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  example: weekends training
+                descripcion:
+                  type: string
+                  example: This training has vareity of exercices. 
+              required:
+                - name
+                - description
+      responses:
+            '200':
+              description: Ok
+  /training/{idTraining}/activities:
+    get:
+      summary: Gives the activities(exercises or sports) of a certain training
+      description: Returns all the activities of a given training id
+      tags:
+        - training
+      parameters:
+        - name: idTraining
+          in: path
+          required: true
+          description: The id of the training
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Set of exercises or sports of a certain training
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    idActividad:
+                      type: integer
+                      description: id of the activity(sport or exercise)
+                    nombre:
+                      type: string
+                     
+                    descripcion:
+                      type: string
+                     
+                    tiempoEjecucion:
+                      type: integer
+                      
+                    numSets:
+                      type: integer
+        
+                    numRepeticiones:
+                      type: integer
+                      
+                    tiempoDescanso:
+                      type: integer
+                    posicion:
+                      type: integer
+                example:
+                  - idactividad: 3
+                    nombre: exerciseTest
+                    descripcion: exerciseDescription
+                    tiempoejecucion: 4
+                    numsets: 3 
+                    numrepeticiones: 2
+                    tiempodescanso: 1
+                    posicion: 3
+                  - idactividad: 4
+                    nombre: exerciseTest_2
+                    descripcion: exerciseDescription_2
+                    tiempoejecucion: 5
+                    numsets: 4 
+                    numrepeticiones: 1
+                    tiempodescanso: 10  
+                    posicion: 4
+                required:
+                  - activitySet
+
+  '/exercise':
+    post:
+      summary: Creates an exercise
+      description: Creates an exercise with the given description and it's associated to the given training 
+      tags:
+        - exercise
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idEntrenamiento:
+                  type: integer
+                  description: id of the training
+                  example: 1
+                nombre:
+                  type: string
+                  example: exerciseTest
+                descripcion:
+                  type: string
+                  example: exerciseDescription
+                tiempoEjecucion:
+                  type: integer
+                  example: 4
+                numSets:
+                  type: integer
+                  example: 3  
+                numRepeticiones:
+                  type: integer
+                  example: 2
+                tiempoDescanso:
+                  type: integer
+                  example: 1
+                posicion:
+                  type: integer
+                  example: 4
+              required:
+                - idEntrenamiento
+                - nombre
+                - descripcion
+                - tiempoEjecucion
+                - numSets
+                - numRepeticiones
+                - tiempoDescanso
+                - posicion
+                
+      responses:
+        '201':
+          description: Exercise created succesfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  idExercise:
+                    type: integer
+                    example: 34
+                required:
+                  - idExercise
+        '400':
+          description: >-
+            Some required parameters are missing or with an incorrect type
+            
+  '/exercise/{id}':
+    delete:
+      summary: Deletes a exercise by id
+      tags:
+        - exercise
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the exercise to delete
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Ok
+    put:
+      summary: Update a exercise by id
+      tags:
+        - exercise
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the exercise to update
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  example: exerciseTestModified
+                descripcion:
+                  type: string
+                  example: exerciseDescriptionModified
+                tiempoEjecucion:
+                  type: integer
+                  example: 5
+                numSets:
+                  type: integer
+                  example: 2  
+                numRepeticiones:
+                  type: integer
+                  example: 1
+                tiempoDescanso:
+                  type: integer
+                  example: 4
+                posicion:
+                  type: integer
+                  example: 5
+              required:
+                - nombre
+                - descripcion
+                - tiempoEjecucion
+                - numSets
+                - numRepeticiones
+                - tiempoDescanso
+                - posicion
+      responses:
+            '200':
+              description: Ok
+              
+  '/diet':
+    post:
+      summary: Creates a diet
+      description: Creates a diet with the given description and name associated with the given user
+      tags:
+        - diet
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  example: Hypertrophy diet
+                descripcion:
+                  type: string
+                  example: Gain muscle
+                idUser:
+                  type: integer
+                  description: id of the user
+                  example: 2
+              required:
+                - nombre
+                - descripcion
+                - idUser
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  idelemento:
+                    type: integer
+                    example: 12345
+                required:
+                  - idelemento
+        '400':
+          description: >-
+            Some required parameters are missing or with an incorrect type
+  '/diet/{id}':
+    delete:
+      summary: Deletes a diet by id
+      tags:
+        - diet
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the diet to delete
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Ok
+    put:
+      summary: Update a diet by id
+      tags:
+        - diet
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the diet to update
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: weekends training
+                description:
+                  type: string
+                  example: This training has vareity of exercices. 
+              required:
+                - name
+                - description
+      responses:
+            200:
+              description: Ok
+  /diet/{idElemento}/{dia}:
+    get:
+      summary: Gives the meals of a certain day for a certain diet
+      description: Returns all the meals of the diet with the given id for the specified day
+      tags:
+        - diet
+      parameters:
+        - name: idElemento
+          in: path
+          required: true
+          description: The id of the diet to get the trainigs from
+          schema:
+            type: integer
+            minimum: 1
+        - name: dia
+          in: path
+          required: true
+          description: day of the week
+          schema:
+            type: string
+            enum: [lunes, martes, miercoles, jueves, viernes, sabado, domingo]
+      responses:
+        200:
+          description: Set of the ids, names and timeToEat of the requested meals
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    idcomida:
+                      type: integer
+                    nombre:
+                      type: string
+                    horacomida:
+                      type: string
+                example:
+                  - idcomida: 56
+                    nombre: MealTest
+                    horacomida: '10:00'
+                  - idcomida: 100
+                    nombre: MealTest2
+                    horacomida: '18:00'
+                required:
+                - mealSet
+  '/meal':
+    post:
+      summary: Creates a meal
+      description: Creates a meal with the given parameters and associated to the given day and diet
+      tags:
+        - meal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  example: MealTest
+                horaComida:
+                  type: string
+                  example: DescriptionTest
+                idElemento:
+                  type: integer
+                  description: id of the diet
+                  example: 10
+                tipoDia:
+                  type: string
+                  description: day of the week
+                  enum: [lunes, martes, miercoles, jueves, viernes, sabado, domingo]
+              required:
+                - nombre
+                - descripcion
+                - idUser
+                - tipoDia
+      responses:
+        '201':
+          description: Meal created succesfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  idcomida:
+                    type: integer
+                    example: 12345
+                required:
+                  - idcomida
+        '400':
+          description: >-
+            Some required parameters are missing or with an incorrect type
+  '/meal/{id}':
+    delete:
+      summary: Deletes a meal by id
+      tags:
+        - meal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the meal to delete
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Ok
+    put:
+      summary: Update a meal by id
+      tags:
+        - meal
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the meal to update
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  example: MealTest2
+                horaComida:
+                  type: string
+                  example: DescriptionTest2
+              required:
+                - name
+                - horaComida
+      responses:
+            200:
+              description: Ok
+  /meal/{idComida}/aliments:
+    get:
+      summary: Gives the aliments of a certain meal for a certain day of a certain diet
+      description: Returns all the aliments of the day of the diet with the given id for the specified meal
+      tags:
+        - meal
+      parameters:
+        - name: idComida
+          in: path
+          required: true
+          description: The id of the meal to get the aliments from
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Set of the ids, names, descriptions and calories of the requested aliments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    idalimento:
+                      type: integer
+                    nombre:
+                      type: string
+                    descripcion:
+                      type: string
+                    calorias:
+                      type: integer
+                example:
+                  - idalimento: 56
+                    nombre: AlimentTest
+                    descripcion: DescriptionTest
+                    calorias: 300
+                  - idalimento: 78
+                    nombre: AlimentTest2
+                    descripcion: DescriptionTest2
+                    calorias: 400
+                required:
+                - alimentSet
+  '/aliment':
+    post:
+      summary: Creates an aliment
+      description: Creates an aliment with the given parameters and associated to the given meal
+      tags:
+        - aliment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  example: AlimentTest
+                descripcion:
+                  type: string
+                  example: DescriptionTest
+                calorias:
+                  type: integer
+                  example: 100
+                idComida:
+                  type: string
+                  description: id of the meal
+                  example: 34
+              required:
+                - nombre
+                - descripcion
+                - calorias
+                - idComida
+      responses:
+        '201':
+          description: Aliment created succesfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  idalimento:
+                    type: integer
+                    example: 12345
+                required:
+                  - idalimento
+        '400':
+          description: >-
+            Some required parameters are missing or with an incorrect type
+  '/aliment/{id}':
+    delete:
+      summary: Deletes an aliment by id
+      tags:
+        - aliment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the aliment to delete
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Ok
+    put:
+      summary: Updates an aliment by id
+      tags:
+        - aliment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the aliment to update
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  example: AlimentTest2
+                descripcion:
+                  type: string
+                  example: DescriptionTest2324324234
+                calorias:
+                  type: integer
+                  example: 200
+              required:
+                - name
+                - descripcion
+                - calorias
+      responses:
+            200:
+              description: Ok
+  '/route':
+    post:
+      summary: Creates a route
+      description: Creates a route associated to the given user. <br>The distance parameter should be expressed in meters.
+      tags:
+        - route
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  example: RouteTest
+                descripcion:
+                  type: string
+                  example: RouteDescriptionTest
+                idUser:
+                  type: integer
+                  description: id of the user
+                  example: 2
+                origen:
+                  type: string
+                  example: '42.471615;2.271684'
+                destino:
+                  type: string
+                  example: '45.471615;5.271684'
+                distancia:
+                  type: string
+                  example: '60' 
+              required:
+                - nombre
+                - descripcion
+                - idUser
+                - origen
+                - destino
+                - distancia
+      responses:
+        '201':
+          description: Training created succesfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  idElemento:
+                    type: integer
+                    example: 12345
+                required:
+                  - idElemento
+        '400':
+          description: >-
+            Some required parameters are missing or with an incorrect type
+  '/route/{id}':
+    delete:
+      summary: Deletes a route by id
+      tags:
+        - route
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the route to delete
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Ok
+    put:
+      summary: Update a route by id
+      description: Updates a route.<br>The distance parameter should be expressed in meters.
+      tags:
+        - route
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the route to update
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                  example: RouteTest
+                descripcion:
+                  type: string
+                  example: RouteDescriptionTest
+                origen:
+                  type: string
+                  example: '42.471615;2.271684'
+                destino:
+                  type: string
+                  example: '45.471615;5.271684'
+                distancia:
+                  type: string
+                  example: '60' 
+              required:
+                - nombre
+                - descripcion
+                - origen
+                - destino
+                - distancia
+      responses:
+            '200':
+              description: Ok
+  '/comment/':
+    post:
+      summary: Creates a comment
+      description: The user will create a comment on an elemetn
+      tags:
+        - comment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idUser:
+                  type: integer
+                  example: 1
+                  description: id of the user that will create the comment
+                idElement:
+                  type: integer
+                  example: 2
+                  description: id of the element OR COMMENT that will contain the comment
+                text:
+                  type: string
+                  example: "nice"
+                  description: text of the comment
+              required:
+                - idUser
+                - idElement
+                - text
+      responses:
+        '201':
+          description: Comment created succesfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  idCom:
+                    type: integer
+                    example: 12345
+                required:
+                  - idCom
+        '400':
+          description: >-
+            Some required parameters are missing or with an incorrect type
+  '/comment/{idComment}':
+    delete:
+      summary: Deletes a comment 
+      description: The comment will be eliminated
+      tags:
+        - comment
+      parameters:
+        - name: idComment
+          in: path
+          required: true
+          description: The id of the comment to be deleted
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        '200':
+          description: Comment removed
+        '400':
+          description: >-
+            Some required parameters are missing or with an incorrect type
+  '/comment/{idElemento}/comments':
+    get:
+      summary: Gets all the comments of an element
+      description: Returns all the information of the comments of an element
+      tags:
+        - comment
+      parameters:
+        - name: idElemento
+          in: path
+          required: true
+          description: The id of the element to get the comments from
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Information of the comments of the element
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    idcomentario:
+                      type: integer
+                      example: 5
+                    idusuario:
+                      type: integer
+                      example: 3
+                    fecha:
+                      type: string
+                      example: '2020-05-26T22:00:00.000Z'
+                    texto:
+                      type: string
+                      example: "nice"
+                    nlikes:
+                      type: integer
+                      example: 2
+  /event:
+    get:
+      summary: Returns all events
+      description: Returns all events ordered by data
+      tags:
+        - event
+      responses:
+        200:
+          description: Returns all events ordered by data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+    post:
+      summary: Creates an event
+      tags:
+        - event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                titulo:
+                  type: string
+                  example: Partido de futbol
+                descripcion:
+                  type: string
+                  example: Hola
+                fecha:
+                  type: string
+                  example: '2020-06-02'
+                hora:
+                  type: string
+                  example: '23:59'
+                localizacion:
+                  type: string
+                  example: '2.0941546718608492;41.323306159501385'
+                idcreador:
+                  type: integer
+                  minimum: 1
+                  example: 1234
+              required:
+                - titulo
+                - descripcion
+                - fecha
+                - hora
+                - localizacion
+                - idcreador
+      responses:
+        201:
+          description: Event created correctly
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    minimum: 1
+                    example: 1234
+  /event/{id}:
+    get:
+      summary: Returns an event
+      tags:
+        - event
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the event
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Event returned correctly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Event'
+    put:
+      summary: Edits an event
+      tags:
+        - event
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the event
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                titulo:
+                  type: string
+                  example: Partido de futbol
+                descripcion:
+                  type: string
+                  example: Hola
+                fecha:
+                  type: string
+                  example: '2020-06-02'
+                hora:
+                  type: string
+                  example: '23:59'
+                localizacion:
+                  type: string
+                  example: '2.0941546718608492;41.323306159501385'
+              required:
+                - titulo
+                - descripcion
+                - fecha
+                - hora
+                - localizacion
+      responses:
+        200:
+          description: Event edited succesfully
+    delete:
+      summary: Deletes an event
+      tags:
+        - event
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the event
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Event deleted succesfully
+  /event/{id}/join:
+    post:
+      summary: Lets a user join an event
+      tags:
+        - event
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the event
+          schema:
+            type: integer
+            minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idusuario:
+                  description: User joinig the event
+                  type: integer
+                  minimum: 1
+                  example: 1234
+      responses:
+        201:
+          description:  Participation created successfully
+  /event/{idEvent}/join/{idUser}:
+    delete:
+      summary: Removes a user from an event
+      tags:
+        - event
+      parameters:
+        - name: idEvent
+          in: path
+          required: true
+          description: The id of the event
+          schema:
+            type: integer
+            minimum: 1
+        - name: idUser
+          in: path
+          required: true
+          description: The id of the user
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: User removed successfully from event 
+  /event/{id}/participants:
+    get:
+      summary: Returns all participants from an event
+      tags:
+        - event
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The id of the event
+          schema:
+            type: integer
+            minimum: 1
+      responses:
+        200:
+          description: Array of users participation the given event
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    minimum: 1
+                    example: 12345
+                  nombre:
+                    type: string
+                    example: Oriol
+  /statistic:
+    post:
+      summary: Creates/updates a new stadistic
+      description: Creates/updates the daily statistic of steps of a given user. If it's call for the first time in the day a statistic is created otherwise the meters of dstRecorrida parameter are added to the one of the existing statistic.<br>Remember that the distance parameter should be expressed in meters.
+      tags:
+        - statistic
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idUser:
+                  type: integer
+                  description: id of the user
+                  example: 2
+                dstRecorrida:
+                  type: string
+                  example: '60'
+              required:
+                - idUse
+                - dstRecorrida
+      responses:
+        '201':
+          description: statistic created succesfully
+        '200':
+          description: statistic update succesfully
+        '400':
+          description: >-
+            Some required parameters are missing or with an incorrect type
+
+  /likeelemento/{idElemento}/{idUsuario}:
+      get:
+        summary: Indicats if idUsuario has voted idElemento
+        tags:
+          - likeelemento
+        parameters:
+          - name: idElemento
+            in: path
+            required: true
+            description: The id of the element
+            schema:
+              type: integer
+              minimum: 1
+          - name: idUsuario
+            in: path
+            required: true
+            description: The id of the user
+            schema:
+              type: integer
+              minimum: 1
+        responses:
+          200:
+            description: Boolean that indicates if the user has liked the element
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    like:
+                      type: boolean
+components:
+  schemas:
+    Event:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 12345
+        titulo:
+          type: string
+          example: Partido de futbol
+        descripcion:
+          type: string
+          example: Hola
+        fecha:
+          type: string
+          example: '2020-06-02'
+        hora:
+          type: string
+          example: '23:59'
+        localizacion:
+          type: string
+          example: '2.0941546718608492;41.323306159501385'
+        idcreador:
+          type: integer
+          minimum: 1
+          example: 456
+      required:
+        - id
+        - titulo
+        - descripcion
+        - fecha
+        - hora
+        - localizacion
+        - idcreador
